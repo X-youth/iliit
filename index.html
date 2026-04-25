@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dream Dress Game+</title>
+
+<style>
+body{
+    margin:0;
+    background:linear-gradient(135deg,#ffd6f9,#c2e9fb,#fbc2eb);
+    font-family:sans-serif;
+    overflow:hidden;
+}
+
+/* 标题 */
+h2{
+    text-align:center;
+    color:white;
+    text-shadow:0 0 10px #fff;
+}
+
+/* 游戏区域 */
+.game{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+}
+
+/* 角色 */
+.character{
+    position:relative;
+    width:220px;
+    height:380px;
+}
+
+.layer{
+    position:absolute;
+    width:100%;
+}
+
+/* 衣服栏 */
+.closet{
+    display:flex;
+    overflow-x:auto;
+    gap:10px;
+    padding:10px;
+    width:100%;
+}
+
+/* 单个衣服 */
+.item{
+    width:70px;
+    height:100px;
+    border-radius:10px;
+    background:rgba(255,255,255,0.5);
+    backdrop-filter:blur(6px);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:12px;
+    cursor:grab;
+}
+
+/* 吸附提示 */
+.character::after{
+    content:"拖到这里✨";
+    position:absolute;
+    bottom:-25px;
+    width:100%;
+    text-align:center;
+    color:white;
+    font-size:12px;
+}
+
+/* 按钮 */
+.actions{
+    margin-top:10px;
+}
+
+button{
+    padding:10px;
+    border:none;
+    border-radius:20px;
+    margin:5px;
+    background:rgba(255,255,255,0.6);
+    font-size:14px;
+}
+</style>
+</head>
+
+<body>
+
+<h2>☁ 梦核拖拽换装 ☁</h2>
+
+<div class="game">
+
+    <!-- 角色 -->
+    <div class="character" id="character">
+        < img src="https://via.placeholder.com/220x380?text=BASE" class="layer">
+        < img id="top" class="layer">
+        < img id="bottom" class="layer">
+        < img id="acc" class="layer">
+    </div>
+
+    <!-- 衣柜 -->
+    <div class="closet">
+
+        <div class="item" draggable="true" data-part="top" data-style="pink">粉上衣</div>
+        <div class="item" draggable="true" data-part="top" data-style="y2k">Y2K上衣</div>
+
+        <div class="item" draggable="true" data-part="bottom" data-style="blue">蓝下装</div>
+        <div class="item" draggable="true" data-part="bottom" data-style="cream">奶下装</div>
+
+        <div class="item" draggable="true" data-part="acc" data-style="weird">怪配饰</div>
+        <div class="item" draggable="true" data-part="acc" data-style="purple">紫配饰</div>
+
+    </div>
+
+    <!-- 操作 -->
+    <div class="actions">
+        <button onclick="random()">🎲 随机</button>
+        <button onclick="clearAll()">🧼 清空</button>
+    </div>
+
+</div>
+
+<script>
+const data={
+    top:{
+        pink:"https://via.placeholder.com/220x380/ffb6c1",
+        y2k:"https://via.placeholder.com/220x380/00ffff"
+    },
+    bottom:{
+        blue:"https://via.placeholder.com/220x380/6495ed",
+        cream:"https://via.placeholder.com/220x380/f5deb3"
+    },
+    acc:{
+        weird:"https://via.placeholder.com/220x380/ff00ff",
+        purple:"https://via.placeholder.com/220x380/b19cd9"
+    }
+};
+
+// 拖拽
+let current=null;
+
+document.querySelectorAll(".item").forEach(el=>{
+    el.addEventListener("dragstart",()=>{
+        current=el;
+    });
+
+    // 手机触摸
+    el.addEventListener("touchstart",()=>{
+        current=el;
+    });
+});
+
+const char=document.getElementById("character");
+
+// 放置
+char.addEventListener("dragover",(e)=>e.preventDefault());
+
+char.addEventListener("drop",()=>{
+    if(!current) return;
+    apply(current);
+});
+
+// 手机点击模拟放置
+char.addEventListener("touchend",()=>{
+    if(current) apply(current);
+});
+
+function apply(el){
+    let part=el.dataset.part;
+    let style=el.dataset.style;
+    document.getElementById(part).src=data[part][style];
+}
+
+// 随机
+function random(){
+    ["top","bottom","acc"].forEach(p=>{
+        let keys=Object.keys(data[p]);
+        let r=keys[Math.floor(Math.random()*keys.length)];
+        document.getElementById(p).src=data[p][r];
+    });
+}
+
+// 清空
+function clearAll(){
+    ["top","bottom","acc"].forEach(p=>{
+        document.getElementById(p).src="";
+    });
+}
+</script>
+
+</body>
+</html>
