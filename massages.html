@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>ILLIT Guestbook 💌✨</title>
+    <link rel="stylesheet" href="https://unpkg.com/7.css">
+    <style>
+        /* 全局鼠标样式修改 */
+html, body, a, button, input {
+    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><path d="M0,0 L0,15 L4,11 L7,17 L9,16 L6,10 L11,10 Z" fill="%2378FFB1" stroke="black" stroke-width="1" style="shape-rendering:crispEdges;"/></svg>'), auto !important;
+}
+
+/* 当鼠标移到按钮或链接上时，可以换成稍微深一点的青色，增加互动感 */
+a:hover, button:hover {
+    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><path d="M0,0 L0,15 L4,11 L7,17 L9,16 L6,10 L11,10 Z" fill="%2356D98E" stroke="black" stroke-width="1" style="shape-rendering:crispEdges;"/></svg>'), pointer !important;
+}
+
+        :root {
+            --y2k-pink: #ff80ab;
+            --y2k-purple: #ea80fc;
+            --glass-bg: rgba(255, 255, 255, 0.4);
+        }
+
+        /* --- 1. 极光流动背景 --- */
+        body {
+            margin: 0; padding: 0; min-height: 100vh;
+            display: flex; justify-content: center; align-items: center;
+            background: linear-gradient(-45deg, #fce4ec, #e1f5fe, #f3e5f5, #e8f5e9);
+            background-size: 400% 400%;
+            animation: aurora 15s ease infinite;
+            overflow: hidden; position: relative;
+        }
+        @keyframes aurora { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+
+        .deco-container { position: absolute; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
+        .deco-item { position: absolute; animation: float 8s ease-in-out infinite; opacity: 0.5; font-size: 24px; }
+        @keyframes float { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-30px) rotate(20deg); } }
+
+        /* --- 2. 留言板主体 --- */
+        .board-window {
+            width: 450px;
+            background: var(--glass-bg) !important;
+            backdrop-filter: blur(15px);
+            border-radius: 20px !important;
+            border: 2px solid rgba(255, 255, 255, 0.6) !important;
+            box-shadow: 10px 10px 30px rgba(255, 128, 171, 0.2) !important;
+            z-index: 10;
+        }
+
+        .title-bar { 
+            background: linear-gradient(90deg, var(--y2k-pink), var(--y2k-purple)) !important;
+            border-radius: 18px 18px 0 0 !important;
+        }
+
+        /* --- 3. 留言列表（修复滑动关键） --- */
+        #message-list {
+            height: 300px; /* 固定高度 */
+            background: rgba(255, 255, 255, 0.6);
+            border: 2px solid var(--y2k-pink);
+            border-radius: 12px;
+            margin-bottom: 15px;
+            overflow-y: scroll; /* 强制显示滚动条区域 */
+            overflow-x: hidden;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        /* 自定义滚动条样式 */
+        #message-list::-webkit-scrollbar { width: 8px; }
+        #message-list::-webkit-scrollbar-thumb { background: var(--y2k-pink); border-radius: 10px; }
+        #message-list::-webkit-scrollbar-track { background: rgba(255,255,255,0.3); }
+
+        .msg-entry {
+            background: white;
+            border-radius: 15px 15px 15px 0;
+            padding: 10px 15px;
+            position: relative;
+            font-size: 13px;
+            color: #444;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.05);
+            animation: slideIn 0.3s ease-out;
+            word-wrap: break-word; /* 自动换行 */
+        }
+
+        /* 删除按钮样式 */
+        .delete-btn {
+            position: absolute;
+            top: 5px; right: 8px;
+            color: #ccc;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .delete-btn:hover { color: var(--y2k-pink); }
+
+        @keyframes slideIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
+
+        .input-group { display: flex; gap: 8px; }
+        input[type="text"] {
+            flex: 1; border-radius: 20px; padding: 8px 15px;
+            border: 2px solid var(--y2k-pink); outline: none;
+        }
+
+        .send-btn {
+            background: var(--y2k-pink); color: white; border: none;
+            border-radius: 20px; padding: 0 20px; font-weight: bold; cursor: pointer;
+        }
+        /* 索引条样式 */
+.global-nav-bar {
+    width: 100%; background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(5px); border-bottom: 2px solid #ff80ab;
+    padding: 8px 0; display: flex; justify-content: center;
+    gap: 15px; position: fixed; top: 0; left: 0; z-index: 9999;
+}
+.global-nav-bar a {
+    text-decoration: none; color: #ff4081; font-size: 12px;
+    font-weight: bold; padding: 3px 8px;
+}
+/* 防止留言板标题被遮挡 */
+.window { margin-top: 60px !important; }
+
+    </style>
+</head>
+<body>
+    <div class="global-nav-bar">
+    <a href="index.html">🏠 首页</a>
+    <a href="music.html">🎶 音乐</a>
+    <a href="menu.html">📁 档案</a>
+    <a href="photo.html">📸 合照</a>
+    <a href="square.html">✨ 广场</a>
+</div>
+
+
+    <div class="deco-container" id="deco-box"></div>
+
+    <div class="window board-window">
+        <div class="title-bar">
+            <div class="title-bar-text">ILLIT_Guestbook.exe</div>
+        </div>
+        <div class="window-body">
+            <div style="text-align: center; margin-bottom: 10px;">
+                <strong style="color: var(--y2k-pink);">🎀 Lucky Message Board 🎀</strong>
+            </div>
+
+            <div id="message-list">
+                <div class="msg-entry">
+                    ✨ 欢迎来到我们的留言板！
+                    <span class="delete-btn" onclick="this.parentElement.remove()">×</span>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <input id="msg-input" type="text" placeholder="输入你想说的话...">
+                <button class="send-btn" onclick="sendMsg()">SEND</button>
+            </div>
+
+            <center>
+                <p onclick="window.location.href='index.html'" style="margin-top:15px; font-size:10px; cursor:pointer; color:var(--y2k-pink); text-decoration:underline;">BACK TO DESKTOP</p>
+            </center>
+        </div>
+    </div>
+
+    <script>
+        // 背景装饰
+        const decoBox = document.getElementById('deco-box');
+        const icons = ['✨', '💖', '🍭', '🌸', '⭐'];
+        for (let i = 0; i < 15; i++) {
+            const item = document.createElement('div');
+            item.className = 'deco-item';
+            item.innerHTML = icons[Math.floor(Math.random() * icons.length)];
+            item.style.left = Math.random() * 100 + 'vw';
+            item.style.top = Math.random() * 100 + 'vh';
+            item.style.animationDelay = (Math.random() * 5) + 's';
+            decoBox.appendChild(item);
+        }
+
+        // 发送留言
+        function sendMsg() {
+            const input = document.getElementById('msg-input');
+            const list = document.getElementById('message-list');
+            
+            if (input.value.trim() === "") return;
+
+            const newMsg = document.createElement('div');
+            newMsg.className = 'msg-entry';
+            
+            // 包含删除按钮的 HTML 结构
+            newMsg.innerHTML = `
+                ${input.value}
+                <span class="delete-btn" onclick="this.parentElement.remove()">×</span>
+            `;
+            
+            list.appendChild(newMsg);
+            input.value = "";
+            
+            // 自动滚动到最底部
+            list.scrollTop = list.scrollHeight;
+        }
+
+        // 回车发送
+        document.getElementById('msg-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMsg();
+        });
+    </script>
+</body>
+</html>
