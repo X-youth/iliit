@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>ILLIT 社区广场 ✨</title>
+    <link rel="stylesheet" href="https://unpkg.com/7.css">
+    <style>
+        /* 全局鼠标样式修改 */
+html, body, a, button, input {
+    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><path d="M0,0 L0,15 L4,11 L7,17 L9,16 L6,10 L11,10 Z" fill="%2378FFB1" stroke="black" stroke-width="1" style="shape-rendering:crispEdges;"/></svg>'), auto !important;
+}
+
+/* 当鼠标移到按钮或链接上时，可以换成稍微深一点的青色，增加互动感 */
+a:hover, button:hover {
+    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><path d="M0,0 L0,15 L4,11 L7,17 L9,16 L6,10 L11,10 Z" fill="%2356D98E" stroke="black" stroke-width="1" style="shape-rendering:crispEdges;"/></svg>'), pointer !important;
+}
+
+        /* --- 沿用 Y2K 风格背景 --- */
+        body {
+            margin: 0; padding: 0; min-height: 100vh;
+            background: linear-gradient(135deg, #ffc1e3 0%, #e1bee7 50%, #b3e5fc 100%);
+            background-size: 400% 400%;
+            animation: aurora 15s ease infinite;
+            display: flex; flex-direction: column; align-items: center;
+            overflow-x: hidden; font-family: 'MS UI Gothic', 'Courier New', monospace;
+        }
+
+        @keyframes aurora {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .global-nav-bar {
+            width: 100%; background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(5px); border-bottom: 2px solid #ff80ab;
+            padding: 10px 0; display: flex; justify-content: center;
+            gap: 15px; position: fixed; top: 0; left: 0; z-index: 9999;
+        }
+        .global-nav-bar a { text-decoration: none; color: #ff4081; font-size: 14px; font-weight: bold; padding: 3px 8px; }
+
+        /* --- 广场内容区 --- */
+        .window {
+            margin-top: 80px !important;
+            width: 95% !important;
+            max-width: 800px !important;
+            background: rgba(255, 255, 255, 0.6) !important;
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            box-shadow: 10px 10px 0px rgba(255, 128, 171, 0.2);
+        }
+
+        /* 发布区域 */
+        .post-box {
+            background: rgba(255, 255, 255, 0.8);
+            margin: 20px; padding: 15px;
+            border: 2px dashed #ff80ab; border-radius: 10px;
+        }
+        textarea {
+            width: 100%; height: 60px; border: 1px solid #ffb2d1;
+            border-radius: 5px; padding: 10px; resize: none; outline: none;
+            font-family: inherit; margin-bottom: 10px;
+        }
+        
+        /* 图片上传控件样式 */
+        .upload-area { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .file-input-label {
+            background: #fff; border: 1px solid #ff80ab; color: #ff80ab;
+            padding: 5px 12px; border-radius: 15px; cursor: pointer; font-size: 12px;
+        }
+        #img-preview-container { 
+            width: 60px; height: 60px; border: 1px solid #eee; 
+            display: none; border-radius: 5px; overflow: hidden;
+        }
+        #img-preview-container img { width: 100%; height: 100%; object-fit: cover; }
+
+        .post-btn {
+            background: #ff80ab; color: white; border: none; 
+            padding: 8px 25px; border-radius: 15px;
+            cursor: pointer; font-weight: bold; transition: 0.3s;
+        }
+        .post-btn:hover { background: #ff4081; transform: scale(1.05); }
+
+        /* 广场动态列表 */
+        #feed-container { padding: 0 20px 20px 20px; display: flex; flex-direction: column; gap: 15px; }
+        /* 广场容器：变成网格布局 */
+#feed-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 一行三格 */
+    gap: 5px; /* 格子之间的缝隙 */
+    padding: 10px;
+}
+
+/* 每一条动态：现在是一个正方形格子 */
+.feed-item {
+    position: relative;
+    aspect-ratio: 1 / 1; /* 强制正方形 */
+    background: #eee;
+    overflow: hidden;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+/* 格子里的图片：铺满整个格子 */
+.post-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* 自动裁剪，保证不变形 */
+}
+
+/* 隐藏原本的文字信息，只有点开才看（或者悬停显示） */
+.user-info, .post-content, .post-time, .del-btn {
+    display: none; 
+}
+
+/* 约在 90 行左右 */
+.text-only-post {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    background: #ffe1ee; 
+    font-size: 11px;    
+    color: #ff4081;
+    padding: 8px;       
+    text-align: center;
+    word-break: break-all; 
+    line-height: 1.2;
+    overflow: hidden;    
+}
+
+
+        /* 删除按钮 */
+        .del-btn {
+            position: absolute; top: 10px; right: 10px;
+            background: none; border: none; color: #ccc;
+            cursor: pointer; font-size: 14px;
+        }
+        .del-btn:hover { color: #ff4081; }
+
+        /* 动态装饰 */
+        .floating-deco {
+            position: fixed; pointer-events: none; opacity: 0.25; z-index: -1;
+            animation: drift linear infinite;
+        }
+        @keyframes drift { from { transform: translateY(110vh) rotate(0deg); } to { transform: translateY(-20vh) rotate(360deg); } }
+
+        @media (max-width: 600px) { .window { margin-top: 60px !important; } }
+    </style>
+</head>
+<body>
+
+    <div class="global-nav-bar">
+        <a href="index.html">🏠 首页</a>
+        <a href="music.html">🎶 音乐</a>
+        <a href="menu.html">📁 档案</a>
+        <a href="photos.html">📸 合照</a>
+        <a href="messages.html">💬 留言</a>
+    </div>
+
+    <div id="deco-layer"></div>
+
+    <div class="window">
+        <div class="title-bar">
+            <div class="title-bar-text">ILLIT_Media_Square.exe</div>
+        </div>
+        <div class="window-body">
+            <p style="text-align: center; font-weight: bold; color: #ff4081; margin-top: 10px;">📸 记录你的 Magnetic 瞬间！ 📸</p>
+            
+            <div class="post-box">
+                <textarea id="post-input" placeholder="写下此刻的想法..."></textarea>
+                
+                <div class="upload-area">
+                    <label class="file-input-label">
+                        📁 选择图片
+                        <input type="file" id="file-input" accept="image/*" style="display: none;" onchange="previewImage(this)">
+                    </label>
+                    <div id="img-preview-container">
+                        <img id="img-preview" src="">
+                    </div>
+                    <div style="flex-grow: 1; text-align: right;">
+                        <button class="post-btn" onclick="publishPost()">发布动态</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="feed-container"></div>
+
+            <div style="text-align: center; padding: 20px;">
+                <button onclick="window.location.href='index.html'">返回桌面</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    let posts = JSON.parse(localStorage.getItem('illit_square_posts_v2')) || [];
+    let currentImageData = ""; // 用于存储当前选中的图片 Base64
+
+    // 1. 预览图片逻辑
+    function previewImage(input) {
+        const container = document.getElementById('img-preview-container');
+        const preview = document.getElementById('img-preview');
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                currentImageData = e.target.result;
+                preview.src = currentImageData;
+                container.style.display = "block";
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    // 2. 渲染帖子（IG九宫格模式）
+    function renderPosts() {
+        const container = document.getElementById('feed-container');
+        container.innerHTML = '';
+        
+        [...posts].reverse().forEach(post => {
+            const item = document.createElement('div');
+            item.className = 'feed-item';
+            
+            // 九宫格显示内容
+                        if (post.image) {
+                // 如果有图就显示图
+                item.innerHTML = `<img src="${post.image}" class="post-img">`;
+            } else {
+                // 如果没图，直接显示文字内容（取前20个字）
+                item.innerHTML = `<div class="text-only-post">${post.content.slice(0, 20)}</div>`;
+            }
+
+            
+            // 点击格子弹出详情，并询问是否删除
+            item.onclick = () => {
+                const action = confirm(`🎀 来自 @${post.user}\n\n内容：${post.content}\n\n发布于：${post.time}\n\n需要删除这条动态吗？`);
+                if (action) {
+                    deletePost(post.id);
+                }
+            };
+            
+            container.appendChild(item);
+        });
+    }
+
+    // 3. 发布帖子
+    function publishPost() {
+        const input = document.getElementById('post-input');
+        if (!input.value.trim() && !currentImageData) return alert("总得发点什么吧~");
+        
+        const newPost = {
+            id: Date.now(),
+            user: "Fan_" + Math.floor(Math.random() * 999),
+            content: input.value,
+            image: currentImageData,
+            time: new Date().toLocaleString()
+        };
+        
+        posts.push(newPost);
+        localStorage.setItem('illit_square_posts_v2', JSON.stringify(posts));
+        
+        // 重置表单
+        input.value = '';
+        currentImageData = '';
+        document.getElementById('img-preview-container').style.display = 'none';
+        document.getElementById('file-input').value = '';
+        renderPosts();
+    }
+
+    // 4. 删除帖子逻辑
+    function deletePost(id) {
+        posts = posts.filter(p => p.id !== id);
+        localStorage.setItem('illit_square_posts_v2', JSON.stringify(posts));
+        renderPosts();
+    }
+
+    // 5. 背景装饰小星星（找回来的装饰代码）
+    const decoLayer = document.getElementById('deco-layer');
+    const icons = ['🌸', '✨', '💕', '⭐'];
+    for (let i = 0; i < 15; i++) {
+        const el = document.createElement('div');
+        el.className = 'floating-deco';
+        el.innerHTML = icons[Math.floor(Math.random() * icons.length)];
+        el.style.left = Math.random() * 100 + 'vw';
+        el.style.fontSize = (Math.random() * 15 + 10) + 'px';
+        el.style.animationDuration = (Math.random() * 10 + 15) + 's';
+        el.style.top = '110vh';
+        decoLayer.appendChild(el);
+    }
+
+    // 初始化运行
+    renderPosts();
+</script>
