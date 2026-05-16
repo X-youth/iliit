@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>ILLIT Archives 📂</title>
+    <link rel="stylesheet" href="https://unpkg.com/7.css">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* 全局鼠标样式修改 */
+html, body, a, button, input {
+    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><path d="M0,0 L0,15 L4,11 L7,17 L9,16 L6,10 L11,10 Z" fill="%2378FFB1" stroke="black" stroke-width="1" style="shape-rendering:crispEdges;"/></svg>'), auto !important;
+}
+
+/* 当鼠标移到按钮或链接上时，可以换成稍微深一点的青色，增加互动感 */
+a:hover, button:hover {
+    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><path d="M0,0 L0,15 L4,11 L7,17 L9,16 L6,10 L11,10 Z" fill="%2356D98E" stroke="black" stroke-width="1" style="shape-rendering:crispEdges;"/></svg>'), pointer !important;
+}
+
+        
+        /* 核心修改：3+2 布局逻辑 */
+        .archive-grid {
+            display: grid;
+            /* 强制分为三列 */
+            grid-template-columns: repeat(3, 1fr); 
+            gap: 20px;
+            padding: 10px;
+        }
+
+        /* 针对第二排的处理：让最后两个卡片居中 */
+        /* 我们通过让第4个卡片从第1列的末尾（或第1.5列）开始，但更稳妥的做法是利用 Grid 的位置指定 */
+        .member-card:nth-child(4) {
+            grid-column: 1 / 2;
+            margin-left: 50%; /* 向右偏移半个身位实现视觉居中 */
+        }
+        .member-card:nth-child(5) {
+            grid-column: 2 / 3;
+            margin-left: 50%;
+        }
+
+        /* 响应式适配：如果是手机端，自动恢复为单列或双列 */
+        @media (max-width: 800px) {
+            .archive-grid {
+                grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            }
+            .member-card:nth-child(4), .member-card:nth-child(5) {
+                grid-column: auto;
+                margin-left: 0;
+            }
+        }
+
+        .member-card {
+    text-align: center;
+    background: #fff;
+    height: fit-content;
+    box-shadow: 10px 10px 0px rgba(0, 0, 0, 0.15); /* 加在这里 */
+}
+
+
+        .member-img {
+            width: 100%;
+            height: 280px;
+            object-fit: cover;
+            border: 2px solid #333;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .member-info {
+            font-size: 11px;
+            line-height: 1.6;
+            text-align: left;
+            padding: 5px 10px;
+        }
+
+        .member-info strong {
+            display: block;
+            font-size: 14px;
+            margin-bottom: 5px;
+            color: #ff4081;
+            text-align: center;
+        }
+
+        .star-effect {
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            font-size: 24px;
+            user-select: none;
+        }
+        /* 索引条样式 */
+.global-nav-bar {
+    width: 100%; background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(5px); border-bottom: 2px solid #ff80ab;
+    padding: 8px 0; display: flex; justify-content: center;
+    gap: 15px; position: fixed; top: 0; left: 0; z-index: 9999;
+}
+.global-nav-bar a {
+    text-decoration: none; color: #ff4081; font-size: 12px;
+    font-weight: bold; padding: 3px 8px;
+}
+/* 修正：让合照亭容器下移，不被导航条遮挡 */
+.booth-container { margin-top: 60px; }
+
+    </style>
+</head>
+<body style="background: #fce4ec; padding: 20px;">
+    <!-- 全局导航条 -->
+<div class="global-nav-bar">
+    <a href="index.html">🏠 首页</a>
+    <a href="music.html">🎶 音乐</a>
+    <a href="photos.html">📸 合照</a>
+    <a href=messages.html">💬 留言</a>
+    <a href="square.html">✨ 广场</a>
+</div>
+cc
+
+    <div class="window" style="width: 95%; max-width: 1100px; margin: 0 auto;">
+        <div class="title-bar">
+            <div class="title-bar-text">ILLIT_Official_Profiles.dat</div>
+            <div class="title-bar-controls">
+                <button aria-label="Close" onclick="window.location.href='index.html'"></button>
+            </div>
+        </div>
+        <div class="window-body">
+            <h2 style="text-align: center; color: #ff4081;">ILLIT 成员档案库</h2>
+            <hr>
+
+            <div class="archive-grid">
+                <!-- 第一排 -->
+                <div class="window member-card">
+                    <div class="title-bar"><div class="title-bar-text">YUNAH.bmp</div></div>
+                    <div class="window-body">
+                        <img src="387.jpeg" class="member-img" alt="YUNAH">
+                        <div class="member-info">
+                            <strong>YUNAH (卢玧我)</strong>
+                            <p>● 国籍：韩国</p>
+                            <p>● MBTI：ENFP</p>
+                            <p>● 生日：2004.01.15</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="window member-card">
+                    <div class="title-bar"><div class="title-bar-text">MINJU.bmp</div></div>
+                    <div class="window-body">
+                        <img src="389.jpeg" class="member-img" alt="MINJU">
+                        <div class="member-info">
+                            <strong>MINJU (朴敏珠)</strong>
+                            <p>● 国籍：韩国</p>
+                            <p>● MBTI：ISTP</p>
+                            <p>● 生日：2004.05.11</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="window member-card">
+                    <div class="title-bar"><div class="title-bar-text">MOKA.bmp</div></div>
+                    <div class="window-body">
+                        <img src="390.jpeg" class="member-img" alt="MOKA">
+                        <div class="member-info">
+                            <strong>MOKA (境 萌花)</strong>
+                            <p>● 国籍：日本</p>
+                            <p>● MBTI：ISFP</p>
+                            <p>● 生日：2004.10.08</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 第二排 -->
+                <div class="window member-card">
+                    <div class="title-bar"><div class="title-bar-text">WONHEE.bmp</div></div>
+                    <div class="window-body">
+                        <img src="391.jpeg" class="member-img" alt="WONHEE">
+                        <div class="member-info">
+                            <strong>WONHEE (李沅禧)</strong>
+                            <p>● 国籍：韩国</p>
+                            <p>● MBTI：ISFP</p>
+                            <p>● 生日：2007.06.26</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="window member-card">
+                    <div class="title-bar"><div class="title-bar-text">IROHA.bmp</div></div>
+                    <div class="window-body">
+                        <img src="388.jpeg" class="member-img" alt="IROHA">
+                        <div class="member-info">
+                            <strong>IROHA (外园 彩羽)</strong>
+                            <p>● 国籍：日本</p>
+                            <p>● MBTI：ISFP</p>
+                            <p>● 生日：2008.02.04</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <hr>
+            <div style="text-align: center; margin-top: 20px;">
+                <button style="padding: 5px 25px;" onclick="window.location.href='index.html'">返回系统桌面</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 星星特效保持不变
+        document.addEventListener('mousemove', function(e) {
+            const star = document.createElement('div');
+            const colors = ['#ff80ab', '#f48fb1', '#ce93d8', '#ffffff'];
+            const icons = ['✨', '⭐', '🌸'];
+            star.className = 'star-effect';
+            star.innerHTML = icons[Math.floor(Math.random() * icons.length)];
+            star.style.color = colors[Math.floor(Math.random() * colors.length)];
+            star.style.left = e.clientX + 'px';
+            star.style.top = e.clientY + 'px';
+            document.body.appendChild(star);
+            let speedY = Math.random() * 2 + 1;
+            let speedX = (Math.random() - 0.5) * 2;
+            let opacity = 1;
+            const animation = setInterval(() => {
+                opacity -= 0.02;
+                let currentTop = parseFloat(star.style.top);
+                let currentLeft = parseFloat(star.style.left);
+                star.style.top = (currentTop + speedY) + 'px';
+                star.style.left = (currentLeft + speedX) + 'px';
+                star.style.opacity = opacity;
+                star.style.transform = `scale(${opacity + 0.5}) rotate(${currentTop}deg)`;
+                if (opacity <= 0) { clearInterval(animation); star.remove(); }
+            }, 30);
+        });
+    </script>
+</body>
+</html>
