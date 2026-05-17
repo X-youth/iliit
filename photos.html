@@ -2,6 +2,7 @@
 <html lang="zh">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ILLIT Photo Booth Pro 📸</title>
     <link rel="stylesheet" href="https://unpkg.com/7.css">
     <style>
@@ -9,7 +10,7 @@
         html, body, a, button, input {
             cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><path d="M0,0 L0,15 L4,11 L7,17 L9,16 L6,10 L11,10 Z" fill="%2378FFB1" stroke="black" stroke-width="1" style="shape-rendering:crispEdges;"/></svg>'), auto !important;
         }
-        body { background: #fce4ec; padding: 10px; min-height: 100vh; display: flex; flex-direction: column; align-items: center; }
+        body { background: #fce4ec; padding: 10px; min-height: 100vh; display: flex; flex-direction: column; align-items: center; -webkit-user-select: none; user-select: none; }
         
         .global-nav-bar {
             width: 100%; background: rgba(255, 255, 255, 0.8);
@@ -20,26 +21,31 @@
 
         .booth-container { margin-top: 60px; display: flex; flex-direction: column; align-items: center; gap: 15px; }
 
-        /* --- 2. 拍立得区域 (比例切换动画) --- */
+        /* --- 2. 拍立得区域 --- */
         #polaroid-frame {
             padding: 15px 15px 60px 15px; background: #ffffff; border: 1px solid #ccc;
             box-shadow: 5px 5px 15px rgba(0,0,0,0.2); position: relative;
-            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
         #polaroid-frame.vertical { width: 320px; }
         #polaroid-frame.horizontal { width: 450px; }
 
         #camera-view {
             background: #000; overflow: hidden; position: relative; border: 1px solid #333;
-            transition: all 0.5s ease;
         }
         .vertical #camera-view { width: 320px; height: 400px; }
         .horizontal #camera-view { width: 450px; height: 300px; }
 
         #video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
 
-        /* 贴纸样式 */
-        .sticker { position: absolute; cursor: move !important; user-select: none; z-index: 10; touch-action: none; }
+        /* 贴纸基础样式 (优化了 transform 表现) */
+        .sticker { 
+            position: absolute; 
+            cursor: move !important; 
+            z-index: 10; 
+            touch-action: none; 
+            transform-origin: center center;
+            display: inline-block;
+        }
         .sticker.emoji { font-size: 40px; line-height: 1; }
         .sticker img { pointer-events: none; height: 100%; display: block; }
 
@@ -47,7 +53,7 @@
 
         /* --- 3. 控制面板 --- */
         .controls { width: 400px; }
-        .btn-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; margin-top: 5px; }
+        .btn-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; margin-top: 5px; }
         .emoji-bar { display: flex; gap: 10px; font-size: 22px; padding: 5px; background: #fff; border: 1px inset #eee; margin: 5px 0; overflow-x: auto; }
         .emoji-bar span { cursor: pointer; }
         .color-picker { display: flex; gap: 8px; justify-content: center; margin: 10px 0; }
@@ -67,28 +73,33 @@
     </div>
 
     <div class="booth-container">
-        <!-- 核心显示区 -->
         <div class="window" style="width: auto;">
             <div class="title-bar"><div class="title-bar-text">ILLIT_Photo_Studio_v2.0.exe</div></div>
             <div class="window-body" style="padding: 20px; display: flex; justify-content: center;">
                 <div id="polaroid-frame" class="vertical">
                     <div id="camera-view">
                         <video id="video" autoplay playsinline></video>
-                        <!-- 动态贴纸层 -->
                     </div>
                     <div class="frame-text">
                         <strong>ILLIT & ME</strong><br>
-                        <span id="date-text">2026.04.26</span>
+                        <span id="date-text">2026.05.16</span>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- 操控区 -->
         <div class="window controls">
             <div class="title-bar"><div class="title-bar-text">Studio_Controls.sys</div></div>
             <div class="window-body">
                 
+                <p style="font-size: 11px; color: #555; background: #ffffcc; padding: 5px; border: 1px dashed #ccc; margin-bottom: 10px;">
+                    💡 <b>全平台操作指南：</b><br>
+                    - <b>拖动位置：</b>鼠标点击或单指按住贴纸即可拖拽。<br>
+                    - <b>放大缩小(iPad/手机)：</b>用两个手指按住贴纸**张开或捏合**。<br>
+                    - <b>放大缩小(电脑)：</b>鼠标悬停在贴纸上，**滚动鼠标滚轮**。<br>
+                    - <b>移除贴纸：</b>双击任意生成的成员或表情即可删除。
+                </p>
+
                 <p><strong>1. 相纸比例与颜色：</strong></p>
                 <div style="display: flex; gap: 10px; margin-bottom: 5px;">
                     <button style="flex: 1;" onclick="setMode('vertical')">📏 竖向模式</button>
@@ -123,7 +134,7 @@
                 <div style="display: flex; gap: 10px;">
                     <button onclick="document.getElementById('upload-input').click()">🖼️ 上传本地图片</button>
                     <input type="file" id="upload-input" style="display:none" accept="image/*" onchange="handleUpload(event)">
-                    <button style="color: red;" onclick="clearAll()">🗑️ 清空贴纸</button>
+                    <button style="color: red;" onclick="clearAll()">🗑️ 清空所有</button>
                 </div>
 
                 <hr>
@@ -150,73 +161,130 @@
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ video: { width: 1280, height: 720 }, audio: false });
                 video.srcObject = stream;
-            } catch (err) { alert("摄像头权限被拒绝"); }
+            } catch (err) { alert("无法获取摄像头权限，请检查设置。"); }
         }
         startCam();
 
-        // 2. 比例与颜色控制
-        function setMode(m) { 
-            frame.className = m; 
-            // 切换比例时，为了防止贴纸“飞走”，简单重置位置或清空
-        }
+        function setMode(m) { frame.className = m; }
         function setFrameColor(c) { frame.style.background = c; }
 
-        // 3. 贴纸系统 (多对象拖拽)
-        let dragTarget = null;
-        let startX, startY, initialX, initialY;
+        // 2. 混合平台交互系统 (支持鼠标拖拽 & 触屏单指拖拽 + 双指缩放)
+        let activeEl = null;
+        let isDragging = false;
+        
+        // 拖拽辅助变量
+        let startX, startY, initLeft, initTop;
+        // 缩放辅助变量
+        let startDistance = 0;
+        let initScale = 1.0;
 
-        function makeDraggable(el) {
-            el.addEventListener('mousedown', (e) => {
-                dragTarget = el;
-                startX = e.clientX;
-                startY = e.clientY;
-                initialX = el.offsetLeft;
-                initialY = el.offsetTop;
-                el.style.zIndex = 1000;
+        function initInteractions(el) {
+            // --- 鼠标/单指按下触发层级置顶 ---
+            const startHandler = (e) => {
+                activeEl = el;
+                document.querySelectorAll('.sticker').forEach(s => s.style.zIndex = 10);
+                el.style.zIndex = 100;
+
+                const isTouch = e.type.startsWith('touch');
+                const touches = isTouch ? e.touches : null;
+
+                if (!isTouch || touches.length === 1) {
+                    // 单指或鼠标：准备拖拽
+                    isDragging = true;
+                    const pointer = isTouch ? touches[0] : e;
+                    startX = pointer.clientX;
+                    startY = pointer.clientY;
+                    initLeft = el.offsetLeft;
+                    initTop = el.offsetTop;
+                } else if (isTouch && touches.length === 2) {
+                    // 双指捏合：准备缩放
+                    isDragging = false;
+                    startDistance = Math.hypot(
+                        touches[0].clientX - touches[1].clientX,
+                        touches[0].clientY - touches[1].clientY
+                    );
+                    initScale = parseFloat(el.dataset.scale || 1.0);
+                }
+            };
+
+            el.addEventListener('mousedown', startHandler);
+            el.addEventListener('touchstart', startHandler, { passive: false });
+
+            // --- 鼠标滚轮缩放支持 (PC端) ---
+            el.addEventListener('wheel', (e) => {
                 e.preventDefault();
-            });
+                let scale = parseFloat(el.dataset.scale || 1.0);
+                const delta = e.deltaY > 0 ? -0.1 : 0.1;
+                scale = Math.min(Math.max(0.3, scale + delta), 3.0);
+                el.dataset.scale = scale;
+                el.style.transform = `scale(${scale})`;
+            }, { passive: false });
+
+            // --- 双击/双击屏幕清除贴纸 ---
+            el.addEventListener('dblclick', () => el.remove());
         }
 
-        document.addEventListener('mousemove', (e) => {
-            if (!dragTarget) return;
-            const dx = e.clientX - startX;
-            const dy = e.clientY - startY;
-            
-            let nx = initialX + dx;
-            let ny = initialY + dy;
+        // --- 全局移动/捏合手势监听 ---
+        const moveHandler = (e) => {
+            if (!activeEl) return;
+            const isTouch = e.type.startsWith('touch');
+            const touches = isTouch ? e.touches : null;
 
-            // 范围限制
-            const maxX = cameraView.clientWidth - dragTarget.clientWidth;
-            const maxY = cameraView.clientHeight - dragTarget.clientHeight;
+            if (isDragging && (!isTouch || touches.length === 1)) {
+                // 执行位置移动
+                const pointer = isTouch ? touches[0] : e;
+                const dx = pointer.clientX - startX;
+                const dy = pointer.clientY - startY;
+                activeEl.style.left = (initLeft + dx) + 'px';
+                activeEl.style.top = (initTop + dy) + 'px';
+            } else if (isTouch && touches.length === 2) {
+                // 执行双指捏合缩放
+                e.preventDefault();
+                const currentDistance = Math.hypot(
+                    touches[0].clientX - touches[1].clientX,
+                    touches[0].clientY - touches[1].clientY
+                );
+                if (startDistance > 0) {
+                    const factor = currentDistance / startDistance;
+                    let scale = Math.min(Math.max(0.3, initScale * factor), 3.0);
+                    activeEl.dataset.scale = scale;
+                    activeEl.style.transform = `scale(${scale})`;
+                }
+            }
+        };
 
-            dragTarget.style.left = Math.max(0, Math.min(nx, maxX)) + 'px';
-            dragTarget.style.top = Math.max(0, Math.min(ny, maxY)) + 'px';
-        });
+        const endHandler = () => {
+            activeEl = null;
+            isDragging = false;
+            startDistance = 0;
+        };
 
-        document.addEventListener('mouseup', () => {
-            if(dragTarget) dragTarget.style.zIndex = 10;
-            dragTarget = null;
-        });
+        document.addEventListener('mousemove', moveHandler);
+        document.addEventListener('touchmove', moveHandler, { passive: false });
+        document.addEventListener('mouseup', endHandler);
+        document.addEventListener('touchend', endHandler);
 
-        // 4. 添加贴纸逻辑
+        // 3. 添加贴纸生产线
         function addSticker(content, type) {
             const el = document.createElement('div');
             el.className = 'sticker ' + (type === 'emoji' ? 'emoji' : '');
-            el.style.left = '20px';
-            el.style.top = '20px';
+            
+            el.dataset.scale = 1.0; // 初始化缩放倍率
+            el.style.left = '40px';
+            el.style.top = '40px';
 
             if (type === 'emoji') {
                 el.innerText = content;
             } else if (type === 'img') {
-                el.style.height = '70%'; // 成员默认高度
+                el.style.height = '220px'; // 成员卡片初始高度
                 el.innerHTML = `<img src="${content}_pose.png" alt="sticker">`;
             } else if (type === 'upload') {
-                el.style.height = '100px';
+                el.style.height = '150px';
                 el.innerHTML = `<img src="${content}" alt="sticker">`;
             }
 
             cameraView.appendChild(el);
-            makeDraggable(el);
+            initInteractions(el); // 赋予拖拽和双指缩放功能
         }
 
         function handleUpload(e) {
@@ -232,58 +300,62 @@
             document.querySelectorAll('.sticker').forEach(s => s.remove());
         }
 
-        // 5. 拍照保存 (精准计算每个贴纸比例)
+        // 4. 精准计算缩放后的图片比例并导出成片
         snap.addEventListener('click', async () => {
             const ctx = canvas.getContext('2d');
             const isH = frame.classList.contains('horizontal');
             
-            // 画布分辨率
             canvas.width = isH ? 1200 : 900;
             canvas.height = isH ? 900 : 1200;
 
-            // 相纸背景
             ctx.fillStyle = frame.style.background || "#ffffff";
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // 计算视窗相对于画布的坐标
             const margin = 40;
             const camW = canvas.width - (margin * 2);
             const camH = isH ? (canvas.height - 200) : (canvas.height - 250);
 
-            // 画视频层
+            // 绘制镜像视频
             ctx.save();
             ctx.translate(canvas.width - margin, margin);
             ctx.scale(-1, 1);
             ctx.drawImage(video, 0, 0, camW, camH);
             ctx.restore();
 
-            // 渲染所有贴纸
+            // 精准计算缩放因子并合成画面
             const stickers = document.querySelectorAll('.sticker');
             for (let s of stickers) {
                 const pL = s.offsetLeft / cameraView.clientWidth;
                 const pT = s.offsetTop / cameraView.clientHeight;
-                const pW = s.clientWidth / cameraView.clientWidth;
-                const pH = s.clientHeight / cameraView.clientHeight;
+                
+                const scale = parseFloat(s.dataset.scale || 1.0);
+                const pW = (s.clientWidth * scale) / cameraView.clientWidth;
+                const pH = (s.clientHeight * scale) / cameraView.clientHeight;
 
-                const targetX = margin + (pL * camW);
-                const targetY = margin + (pT * camH);
+                // 修正由 transform scale 引起的几何中心点偏差计算
+                const offsetW = (s.clientWidth * (scale - 1)) / 2 / cameraView.clientWidth;
+                const offsetH = (s.clientHeight * (scale - 1)) / 2 / cameraView.clientHeight;
+
+                const targetX = margin + ((pL - offsetW) * camW);
+                const targetY = margin + ((pT - offsetH) * camH);
                 const targetW = pW * camW;
                 const targetH = pH * camH;
 
                 if (s.classList.contains('emoji')) {
                     const baseSize = parseFloat(window.getComputedStyle(s).fontSize);
-                    const drawSize = (baseSize / cameraView.clientHeight) * camH;
+                    const drawSize = (baseSize / cameraView.clientHeight) * camH * scale;
                     ctx.font = `${drawSize}px serif`;
                     ctx.textBaseline = 'top';
                     ctx.fillText(s.innerText, targetX, targetY);
                 } else {
                     const img = s.querySelector('img');
-                    ctx.drawImage(img, targetX, targetY, targetW, targetH);
+                    if(img) ctx.drawImage(img, targetX, targetY, targetW, targetH);
                 }
             }
 
+            // 触发下载
             const link = document.createElement('a');
-            link.download = `ILLIT_BOOTH_STudio_${Date.now()}.png`;
+            link.download = `ILLIT_BOOTH_${Date.now()}.png`;
             link.href = canvas.toDataURL('image/png');
             link.click();
         });
