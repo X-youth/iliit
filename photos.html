@@ -37,7 +37,7 @@
 
         #video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
 
-        /* 贴纸基础样式 (优化 transform 支持缩放+旋转联合表现) */
+        /* 贴纸基础样式 (优化了 transform 表现) */
         .sticker { 
             position: absolute; 
             cursor: move !important; 
@@ -74,7 +74,7 @@
 
     <div class="booth-container">
         <div class="window" style="width: auto;">
-            <div class="title-bar"><div class="title-bar-text">ILLIT_Photo_Studio_v3.0.exe</div></div>
+            <div class="title-bar"><div class="title-bar-text">ILLIT_Photo_Studio_v2.0.exe</div></div>
             <div class="window-body" style="padding: 20px; display: flex; justify-content: center;">
                 <div id="polaroid-frame" class="vertical">
                     <div id="camera-view">
@@ -93,11 +93,11 @@
             <div class="window-body">
                 
                 <p style="font-size: 11px; color: #555; background: #ffffcc; padding: 5px; border: 1px dashed #ccc; margin-bottom: 10px;">
-                    💡 <b>贴纸高级操控指南：</b><br>
-                    - <b>移动：</b>鼠标点击或单指按住拖拽。<br>
-                    - <b>缩放与旋转 (iPad/触屏)：</b>用两个手指按住贴纸，**张开/捏合**控制大小，**旋转手指**控制贴纸角度。<br>
-                    - <b>缩放与旋转 (电脑端)：</b>鼠标悬停在贴纸上，直接**滚动滚轮**放大缩小；按住键盘 **`Shift` 键+滚动滚轮** 即可让贴纸旋转。<br>
-                    - <b>删除：</b>双击任意生成的元素即可将其清除。
+                    💡 <b>全平台操作指南：</b><br>
+                    - <b>拖动位置：</b>鼠标点击或单指按住贴纸即可拖拽。<br>
+                    - <b>放大缩小(iPad/手机)：</b>用两个手指按住贴纸**张开或捏合**。<br>
+                    - <b>放大缩小(电脑)：</b>鼠标悬停在贴纸上，**滚动鼠标滚轮**。<br>
+                    - <b>移除贴纸：</b>双击任意生成的成员或表情即可删除。
                 </p>
 
                 <p><strong>1. 相纸比例与颜色：</strong></p>
@@ -112,7 +112,7 @@
                     <div class="color-btn" style="background: #fff9c4;" onclick="setFrameColor('#fff9c4')"></div>
                 </div>
 
-                <p><strong>2. 贴纸库 (点击添加)：</strong></p>
+                <p><strong>2. 贴纸库 (点击添加，在预览框内拖动)：</strong></p>
                 <div class="btn-grid">
                     <button onclick="addSticker('yunah', 'img')">YUNAH</button>
                     <button onclick="addSticker('minju', 'img')">MINJU</button>
@@ -168,21 +168,18 @@
         function setMode(m) { frame.className = m; }
         function setFrameColor(c) { frame.style.background = c; }
 
-        // 2. 混合平台交互系统 (全面集成：位移、缩放、双指旋转)
+        // 2. 混合平台交互系统 (支持鼠标拖拽 & 触屏单指拖拽 + 双指缩放)
         let activeEl = null;
         let isDragging = false;
         
+        // 拖拽辅助变量
         let startX, startY, initLeft, initTop;
-        let startDistance = 0, startAngle = 0;
-        let initScale = 1.0, initRotate = 0;
-
-        function updateTransform(el) {
-            const scale = el.dataset.scale || 1.0;
-            const rotate = el.dataset.rotate || 0;
-            el.style.transform = `scale(${scale}) rotate(${rotate}deg)`;
-        }
+        // 缩放辅助变量
+        let startDistance = 0;
+        let initScale = 1.0;
 
         function initInteractions(el) {
+            // --- 鼠标/单指按下触发层级置顶 ---
             const startHandler = (e) => {
                 activeEl = el;
                 document.querySelectorAll('.sticker').forEach(s => s.style.zIndex = 10);
@@ -192,6 +189,7 @@
                 const touches = isTouch ? e.touches : null;
 
                 if (!isTouch || touches.length === 1) {
+                    // 单指或鼠标：准备拖拽
                     isDragging = true;
                     const pointer = isTouch ? touches[0] : e;
                     startX = pointer.clientX;
@@ -199,98 +197,86 @@
                     initLeft = el.offsetLeft;
                     initTop = el.offsetTop;
                 } else if (isTouch && touches.length === 2) {
+                    // 双指捏合：准备缩放
                     isDragging = false;
-                    // 双指初始物理距离
                     startDistance = Math.hypot(
                         touches[0].clientX - touches[1].clientX,
                         touches[0].clientY - touches[1].clientY
                     );
-                    // 双指初始角度
-                    startAngle = Math.atan2(
-                        touches[1].clientY - touches[0].clientY,
-                        touches[1].clientX - touches[0].clientX
-                    ) * 180 / Math.PI;
-
                     initScale = parseFloat(el.dataset.scale || 1.0);
-                    initRotate = parseFloat(el.dataset.rotate || 0);
                 }
             };
 
             el.addEventListener('mousedown', startHandler);
             el.addEventListener('touchstart', startHandler, { passive: false });
 
-            // 电脑端：滚轮逻辑控制 (普通滚动=缩放，按住Shift滚动=旋转)
+            // --- 鼠标滚轮缩放支持 (PC端) ---
             el.addEventListener('wheel', (e) => {
                 e.preventDefault();
-                if (e.shiftKey) {
-                    // 旋转控制
-                    let rotate = parseFloat(el.dataset.rotate || 0);
-                    rotate += e.deltaY > 0 ? 5 : -5;
-                    el.dataset.rotate = rotate;
-                } else {
-                    // 缩放控制
-                    let scale = parseFloat(el.dataset.scale || 1.0);
-                    scale += e.deltaY > 0 ? -0.05 : 0.05;
-                    el.dataset.scale = Math.min(Math.max(0.3, scale), 3.0);
-                }
-                updateTransform(el);
+                let scale = parseFloat(el.dataset.scale || 1.0);
+                const delta = e.deltaY > 0 ? -0.1 : 0.1;
+                scale = Math.min(Math.max(0.3, scale + delta), 3.0);
+                el.dataset.scale = scale;
+                el.style.transform = `scale(${scale})`;
             }, { passive: false });
 
+            // --- 双击/双击屏幕清除贴纸 ---
             el.addEventListener('dblclick', () => el.remove());
         }
 
+        // --- 全局移动/捏合手势监听 ---
         const moveHandler = (e) => {
             if (!activeEl) return;
             const isTouch = e.type.startsWith('touch');
             const touches = isTouch ? e.touches : null;
 
             if (isDragging && (!isTouch || touches.length === 1)) {
+                // 执行位置移动
                 const pointer = isTouch ? touches[0] : e;
-                activeEl.style.left = (initLeft + (pointer.clientX - startX)) + 'px';
-                activeEl.style.top = (initTop + (pointer.clientY - startY)) + 'px';
+                const dx = pointer.clientX - startX;
+                const dy = pointer.clientY - startY;
+                activeEl.style.left = (initLeft + dx) + 'px';
+                activeEl.style.top = (initTop + dy) + 'px';
             } else if (isTouch && touches.length === 2) {
+                // 执行双指捏合缩放
                 e.preventDefault();
-                // 1. 处理捏合缩放
                 const currentDistance = Math.hypot(
                     touches[0].clientX - touches[1].clientX,
                     touches[0].clientY - touches[1].clientY
                 );
                 if (startDistance > 0) {
-                    activeEl.dataset.scale = Math.min(Math.max(0.3, initScale * (currentDistance / startDistance)), 3.0);
+                    const factor = currentDistance / startDistance;
+                    let scale = Math.min(Math.max(0.3, initScale * factor), 3.0);
+                    activeEl.dataset.scale = scale;
+                    activeEl.style.transform = `scale(${scale})`;
                 }
-                // 2. 处理双指旋转
-                const currentAngle = Math.atan2(
-                    touches[1].clientY - touches[0].clientY,
-                    touches[1].clientX - touches[0].clientX
-                ) * 180 / Math.PI;
-                const angleDiff = currentAngle - startAngle;
-                activeEl.dataset.rotate = initRotate + angleDiff;
-
-                updateTransform(activeEl);
             }
         };
 
-        const endHandler = () => { activeEl = null; isDragging = false; startDistance = 0; };
+        const endHandler = () => {
+            activeEl = null;
+            isDragging = false;
+            startDistance = 0;
+        };
 
         document.addEventListener('mousemove', moveHandler);
         document.addEventListener('touchmove', moveHandler, { passive: false });
         document.addEventListener('mouseup', endHandler);
         document.addEventListener('touchend', endHandler);
 
-        // 3. 添加贴纸核心工厂
+        // 3. 添加贴纸生产线
         function addSticker(content, type) {
             const el = document.createElement('div');
             el.className = 'sticker ' + (type === 'emoji' ? 'emoji' : '');
             
-            el.dataset.scale = 1.0;
-            el.dataset.rotate = 0; // 新增：角度初始化
-            el.style.left = '60px';
-            el.style.top = '60px';
+            el.dataset.scale = 1.0; // 初始化缩放倍率
+            el.style.left = '40px';
+            el.style.top = '40px';
 
             if (type === 'emoji') {
                 el.innerText = content;
             } else if (type === 'img') {
-                el.style.height = '220px';
+                el.style.height = '220px'; // 成员卡片初始高度
                 el.innerHTML = `<img src="${content}_pose.png" alt="sticker">`;
             } else if (type === 'upload') {
                 el.style.height = '150px';
@@ -298,7 +284,81 @@
             }
 
             cameraView.appendChild(el);
-            initInteractions(el);
+            initInteractions(el); // 赋予拖拽和双指缩放功能
         }
 
-        function handleUpload(
+        function handleUpload(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (ev) => addSticker(ev.target.result, 'upload');
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function clearAll() {
+            document.querySelectorAll('.sticker').forEach(s => s.remove());
+        }
+
+        // 4. 精准计算缩放后的图片比例并导出成片
+        snap.addEventListener('click', async () => {
+            const ctx = canvas.getContext('2d');
+            const isH = frame.classList.contains('horizontal');
+            
+            canvas.width = isH ? 1200 : 900;
+            canvas.height = isH ? 900 : 1200;
+
+            ctx.fillStyle = frame.style.background || "#ffffff";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            const margin = 40;
+            const camW = canvas.width - (margin * 2);
+            const camH = isH ? (canvas.height - 200) : (canvas.height - 250);
+
+            // 绘制镜像视频
+            ctx.save();
+            ctx.translate(canvas.width - margin, margin);
+            ctx.scale(-1, 1);
+            ctx.drawImage(video, 0, 0, camW, camH);
+            ctx.restore();
+
+            // 精准计算缩放因子并合成画面
+            const stickers = document.querySelectorAll('.sticker');
+            for (let s of stickers) {
+                const pL = s.offsetLeft / cameraView.clientWidth;
+                const pT = s.offsetTop / cameraView.clientHeight;
+                
+                const scale = parseFloat(s.dataset.scale || 1.0);
+                const pW = (s.clientWidth * scale) / cameraView.clientWidth;
+                const pH = (s.clientHeight * scale) / cameraView.clientHeight;
+
+                // 修正由 transform scale 引起的几何中心点偏差计算
+                const offsetW = (s.clientWidth * (scale - 1)) / 2 / cameraView.clientWidth;
+                const offsetH = (s.clientHeight * (scale - 1)) / 2 / cameraView.clientHeight;
+
+                const targetX = margin + ((pL - offsetW) * camW);
+                const targetY = margin + ((pT - offsetH) * camH);
+                const targetW = pW * camW;
+                const targetH = pH * camH;
+
+                if (s.classList.contains('emoji')) {
+                    const baseSize = parseFloat(window.getComputedStyle(s).fontSize);
+                    const drawSize = (baseSize / cameraView.clientHeight) * camH * scale;
+                    ctx.font = `${drawSize}px serif`;
+                    ctx.textBaseline = 'top';
+                    ctx.fillText(s.innerText, targetX, targetY);
+                } else {
+                    const img = s.querySelector('img');
+                    if(img) ctx.drawImage(img, targetX, targetY, targetW, targetH);
+                }
+            }
+
+            // 触发下载
+            const link = document.createElement('a');
+            link.download = `ILLIT_BOOTH_${Date.now()}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        });
+    </script>
+</body>
+</html>
