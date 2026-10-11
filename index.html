@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ILLIT Dreamcore World 🎀</title>
+    <title>ILLIT Retro World 🎀</title>
     <link rel="stylesheet" href="https://unpkg.com/7.css">
     <style>
         /* --- 全局鼠标与复古基础样式 --- */
@@ -24,15 +24,15 @@
             100% { background-position: 0% 50%; }
         }
 
-        /* 顶部通用导航栏 */
+        /* 顶部精简导航栏 */
         .global-nav-bar {
             width: 100%; background: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(5px); border-bottom: 2px solid #ff80ab;
-            padding: 8px 0; display: flex; justify-content: center; gap: 15px; 
+            padding: 8px 0; display: flex; justify-content: center; gap: 20px; 
             position: fixed; top: 0; left: 0; z-index: 9999;
         }
         .global-nav-bar a { 
-            text-decoration: none; color: #ff4081; font-size: 12px; font-weight: bold; padding: 3px 8px; 
+            text-decoration: none; color: #ff4081; font-size: 12px; font-weight: bold; padding: 3px 10px; 
         }
 
         /* 首页主体容器 */
@@ -40,30 +40,15 @@
             margin-top: 70px; width: 90%; max-width: 600px; 
             display: flex; flex-direction: column; gap: 20px; padding-bottom: 30px;
         }
-
-        /* 动态图表卡片样式 */
-        .monitor-screen {
-            background: #1a1a1a; border: 2px inset #fff; padding: 10px;
-            color: #78FFB1; font-size: 12px; position: relative;
-        }
-        canvas {
-            width: 100%; height: 120px; background: #000; border: 1px solid #444; display: block;
-        }
-        
-        .stat-row {
-            display: flex; justify-content: space-between; margin-top: 8px; font-size: 11px; color: #fff;
-        }
-        .stat-val { color: #ff80ab; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <!-- 顶部导航栏 -->
-<div class="global-nav-bar">
-    <a href="index.html">🏠 首页</a>
-    <a href="music.html">🎶 音乐</a>
-    <a href="photos.html">📸 合照</a>
-</div>
+    <!-- 顶部精简导航栏（只留首页、音乐、合照） -->
+    <div class="global-nav-bar">
+        <a href="index.html">🏠 首页</a>
+        <a href="music.html">🎶 音乐</a>
+        <a href="photos.html">📸 合照</a>
     </div>
 
     <div class="main-container">
@@ -74,39 +59,30 @@
                 <div class="title-bar-text">ILLIT_Welcome_Center.exe</div>
             </div>
             <div class="window-body" style="text-align: center;">
-                <h2 style="color: #ff4081; margin: 10px 0;">✨ Welcome to ILLIT World ✨</h2>
-                <p style="color: #555; font-size: 13px;">Y2K / Dreamcore 风格粉丝应援站已全面上线！</p>
+                <h2 style="color: #ff4081; margin: 10px 0;">✨ ILLIT Retro Project ✨</h2>
+                <p style="color: #555; font-size: 13px;">欢迎来到复古风格作品展示与互动空间！</p>
                 <hr style="border: 0; border-top: 1px dashed #ccc; margin: 15px 0;">
                 <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
-                    <button onclick="window.location.href='music.html'">🎵 进入音乐电台</button>
-                    <button onclick="window.location.href='photos.html'">📸 开启大头贴拍立得</button>
+                    <button onclick="window.location.href='music.html'">🎵 进入音乐与频谱</button>
+                    <button onclick="window.location.href='photos.html'">📸 开启拍立得合照</button>
                 </div>
             </div>
         </div>
 
-        <!-- 实时信息可视化与动态图表窗口 -->
+        <!-- 作品发展时间轴窗口 -->
         <div class="window">
             <div class="title-bar">
-                <div class="title-bar-text">Stage_Energy_Monitor.sys (Live)</div>
+                <div class="title-bar-text">Works_Timeline_History.sys</div>
             </div>
             <div class="window-body">
-                <p style="margin-top: 0; font-size: 12px; color: #333;">
-                    📊 <b>实时应援能量与舞台数据流：</b>系统正在监视实时交互与粉丝能量波峰。
-                </p>
+                <p style="font-size: 12px; margin-top: 0;">📅 <b>拖动年份查看发展历程：</b> <span id="yearDisplay" style="color: #ff4081; font-weight: bold;">2024</span></p>
                 
-                <!-- 动态可视化 Canvas 曲线监视器 -->
-                <div class="monitor-screen">
-                    <div style="margin-bottom: 5px; color: #ff80ab;">⚡ [ENERGY_WAVE_OUTPUT]</div>
-                    <canvas id="energyCanvas"></canvas>
-                    <div class="stat-row">
-                        <span>当前心跳/Vibe指数: <span id="vibeVal" class="stat-val">98.5</span> BPM</span>
-                        <span>应援能量消耗: <span id="powerVal" class="stat-val">1.2</span> kW</span>
-                    </div>
-                </div>
-
-                <div style="margin-top: 15px; display: flex; gap: 10px; justify-content: center;">
-                    <button onclick="boostEnergy()">🔥 注入应援能量 (+Boost)</button>
-                    <button onclick="resetData()">🔄 重置波形</button>
+                <!-- 年份拖动条 -->
+                <input type="range" id="yearSlider" min="2024" max="2026" step="1" value="2024" style="width: 100%; margin: 10px 0;" oninput="updateTimeline(this.value)">
+                
+                <!-- 动态内容显示框 -->
+                <div id="timelineContent" style="background: #fff; padding: 12px; border: 1px inset #ccc; font-size: 12px; line-height: 1.6;">
+                    <!-- 由 JS 动态填充 -->
                 </div>
             </div>
         </div>
@@ -114,72 +90,24 @@
     </div>
 
     <script>
-        // --- 实时动态可视化图表核心逻辑 ---
-        const canvas = document.getElementById('energyCanvas');
-        const ctx = canvas.getContext('2d');
-        
-        // 调整分辨率匹配显示
-        canvas.width = canvas.clientWidth;
-        canvas.height = 120;
+        // 时间轴数据库
+        const timelineData = {
+            "2024": { album: "SUPER REAL ME (出道迷你专辑)", song: "Magnetic", event: "正式出道，凭借标志性风格打破多项流媒体新人记录。" },
+            "2025": { album: "I'LL LIKE YOU (第二张迷你专辑)", song: "Cherish (My Love)", event: "发布全新概念作品，开启多城市粉丝见面会与全球音乐节演出。" },
+            "2026": { album: "Digital Single / Special Project", song: "New Release Vibe", event: "推出全新数字单曲，上线多维互动与实时可视化数据监视系统。" }
+        };
 
-        let dataPoints = new Array(50).fill(50);
-        let currentVibe = 98.5;
-
-        function drawChart() {
-            ctx.fillStyle = '#000000';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            // 绘制网格背景线
-            ctx.strokeStyle = '#222222';
-            ctx.lineWidth = 1;
-            for (let i = 0; i < canvas.width; i += 20) {
-                ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, canvas.height); ctx.stroke();
-            }
-            for (let j = 0; j < canvas.height; j += 20) {
-                ctx.beginPath(); ctx.moveTo(0, j); ctx.lineTo(canvas.width, j); ctx.stroke();
-            }
-
-            // 动态产生新的随机波动数据模拟实时流
-            let lastVal = dataPoints[dataPoints.length - 1];
-            let nextVal = lastVal + (Math.random() * 20 - 10);
-            nextVal = Math.max(10, Math.min(110, nextVal)); // 限制在高度内
-            dataPoints.shift();
-            dataPoints.push(nextVal);
-
-            // 绘制平滑或折线动态曲线
-            ctx.strokeStyle = '#78FFB1';
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            
-            let stepX = canvas.width / (dataPoints.length - 1);
-            for (let i = 0; i < dataPoints.length; i++) {
-                let x = i * stepX;
-                let y = canvas.height - (dataPoints[i] / 120) * canvas.height;
-                if (i === 0) ctx.moveTo(x, y);
-                else ctx.lineTo(x, y);
-            }
-            ctx.stroke();
-
-            // 随机更新动态数值显示
-            currentVibe = (95 + Math.random() * 8).toFixed(1);
-            document.getElementById('vibeVal').innerText = currentVibe;
+        function updateTimeline(year) {
+            document.getElementById('yearDisplay').innerText = year;
+            const data = timelineData[year];
+            document.getElementById('timelineContent').innerHTML = `
+                <p style="margin: 4px 0;"><b>💿 核心专辑：</b>${data.album}</p>
+                <p style="margin: 4px 0;"><b>🎵 代表曲目：</b>${data.song}</p>
+                <p style="margin: 4px 0; color: #555;"><b>✨ 重要事件：</b>${data.event}</p>
+            `;
         }
-
-        // 定时刷新产生动态波形 (每 150 毫秒刷新一帧)
-        setInterval(drawChart, 150);
-
-        // 交互功能：点击注入能量时，瞬间让图表数据飙升
-        function boostEnergy() {
-            for (let i = 0; i < dataPoints.length; i++) {
-                dataPoints[i] = Math.min(115, dataPoints[i] + Math.random() * 40);
-            }
-            document.getElementById('powerVal').innerText = (Math.random() * 3 + 3.5).toFixed(1);
-        }
-
-        function resetData() {
-            dataPoints.fill(50);
-            document.getElementById('powerVal').innerText = "1.2";
-        }
+        // 初始化默认显示 2024
+        updateTimeline("2024");
     </script>
 </body>
 </html>
