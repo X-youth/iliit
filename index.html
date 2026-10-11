@@ -22,64 +22,67 @@
         .progress-container { width: 100%; height: 20px; background: #fff; border: 2px inset #fff; margin-top: 10px; }
         #progress-bar { width: 0%; height: 100%; background-color: #B2FFFF; transition: width 0.1s linear; }
 
-        /* --- 3. 浮动动画 --- */
-        @keyframes floating {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-            100% { transform: translateY(0px); }
-        }
-
-        /* --- 4. 页面主体 (保留粉色波点) --- */
+        /* --- 3. 页面主体：采用桌面左右分栏，无需上下滚动 --- */
         body {
-            margin: 0; padding: 20px 0;
+            margin: 0; padding: 0;
             background-color: #ffb2d1;
             background-image: radial-gradient(#ffffff 1.5px, transparent 1.5px);
             background-size: 20px 20px;
             font-family: sans-serif;
-            display: flex; flex-direction: column; align-items: center;
-            min-height: 100vh; overflow-y: auto;
+            display: flex; justify-content: center; align-items: center;
+            min-height: 100vh; overflow: hidden;
         }
 
+        /* 桌面大容器：左右并排 */
+        .desktop-container {
+            display: flex; gap: 15px; width: 95%; max-width: 1050px; justify-content: center; align-items: stretch;
+        }
+
+        /* 统一的复古视窗卡片样式 */
         .window {
             background: #ffffff; border: 2px solid #5a8bc1; 
-            width: 90%; max-width: 550px; box-shadow: 4px 4px 0px #000;
-            display: flex; flex-direction: column; margin-bottom: 20px;
-            animation: floating 4s ease-in-out infinite; 
+            box-shadow: 4px 4px 0px #000;
+            display: flex; flex-direction: column;
         }
 
-        .win-header { background: linear-gradient(to right, #73a3d4, #b2d1f0); height: 30px; display: flex; justify-content: space-between; align-items: center; padding: 0 8px; border-bottom: 2px solid #5a8bc1; }
-        .win-title { color: white; font-size: 14px; font-weight: bold; }
-        .win-controls span { border: 1px solid #fff; background: #eee; font-size: 11px; padding: 1px 5px; margin-left: 2px; box-shadow: 1px 1px 0px #000; }
-        .win-content { text-align: center; padding: 10px; }
-        .pink-title { color: #ff4081; font-weight: bold; margin: 10px 0; font-size: 22px; }
-        .photo-frame { width: 85%; height: auto; border: 1px solid #888; margin: 0 auto; display: block; }
-        .welcome-msg { text-align: left; font-size: 13px; padding: 10px 20px; border-bottom: 1px solid #ccc; line-height: 1.4; color: #333; }
+        .win-header { background: linear-gradient(to right, #73a3d4, #b2d1f0); height: 26px; display: flex; justify-content: space-between; align-items: center; padding: 0 8px; border-bottom: 2px solid #5a8bc1; }
+        .win-title { color: white; font-size: 12px; font-weight: bold; }
+        .win-controls span { border: 1px solid #fff; background: #eee; font-size: 10px; padding: 0 4px; margin-left: 2px; box-shadow: 1px 1px 0px #000; }
+        .win-content { text-align: center; padding: 12px; flex: 1; display: flex; flex-direction: column; justify-content: center; }
+        
+        /* 左侧主窗口样式 */
+        .left-window { flex: 1; max-width: 480px; }
+        .pink-title { color: #ff4081; font-weight: bold; margin: 5px 0 10px 0; font-size: 20px; }
+        .photo-frame { width: 75%; height: auto; border: 1px solid #888; margin: 0 auto; display: block; max-height: 240px; object-fit: cover; }
+        .welcome-msg { text-align: left; font-size: 12px; padding: 8px 15px; border-bottom: 1px solid #ccc; line-height: 1.4; color: #333; margin-top: 8px; }
 
-        .quick-access { padding: 15px 20px; text-align: left; }
-        .nav-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        .quick-access { padding: 10px 15px; text-align: left; }
+        .nav-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
         
         .btn-retro {
             background: #e1e1e1; border: 1px solid #999;
-            padding: 10px; font-size: 13px; cursor: pointer;
-            display: flex; align-items: center; justify-content: center; gap: 6px;
+            padding: 8px; font-size: 12px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; gap: 5px;
             box-shadow: 2px 2px 0px #999, inset 1px 1px 0 #fff;
             transition: 0.2s; font-weight: bold; color: #333; text-decoration: none;
         }
         .btn-retro:hover { background: #eee; transform: translate(-1px, -1px); box-shadow: 3px 3px 0px #888; color: #ff4081; }
-        
-        .status-bar { background: #f0f0f0; border-top: 2px solid #5a8bc1; display: flex; justify-content: space-between; padding: 5px 15px; font-size: 11px; color: #444; }
+
+        /* 右侧子窗口堆叠容器 */
+        .right-column { width: 420px; display: flex; flex-direction: column; gap: 15px; }
+
+        .status-bar { background: #f0f0f0; border-top: 2px solid #5a8bc1; display: flex; justify-content: space-between; padding: 3px 10px; font-size: 10px; color: #444; }
 
         /* 动态数据监视器小屏幕样式 */
         .monitor-screen {
-            background: #1a1a1a; border: 2px inset #fff; padding: 10px;
-            color: #78FFB1; font-size: 11px; position: relative; text-align: left;
-            margin: 15px 20px;
+            background: #1a1a1a; border: 2px inset #fff; padding: 8px;
+            color: #78FFB1; font-size: 11px; text-align: left; margin-top: 5px;
         }
         canvas {
-            width: 100%; height: 90px; background: #000; border: 1px solid #444; display: block; margin-top: 5px;
+            width: 100%; height: 70px; background: #000; border: 1px solid #444; display: block; margin-top: 4px;
         }
         .stat-row {
-            display: flex; justify-content: space-between; margin-top: 6px; font-size: 10px; color: #fff;
+            display: flex; justify-content: space-between; margin-top: 4px; font-size: 10px; color: #fff;
         }
         .stat-val { color: #ff80ab; font-weight: bold; }
     </style>
@@ -98,67 +101,77 @@
         </div>
     </div>
 
-    <!-- 1. 首页主窗口 (保留你的经典照片与精简导航) -->
-    <div class="window">
-        <div class="win-header">
-            <div class="win-title">WELCOME_TO_ILLIT.exe</div>
-            <div class="win-controls"><span>_</span><span>▢</span><span>X</span></div>
-        </div>
-        <div class="win-content">
-            <div class="pink-title">Magnetic Love! 🎧</div>
-            <img src="IMG_4415.jpeg" class="photo-frame" alt="ILLIT Photo">
-            <div class="welcome-msg">欢迎回来！经典复古频道与互动系统已全部准备就绪。</div>
-            <div class="quick-access">
-                <div class="nav-grid">
-                    <a class="btn-retro" href="music.html">🎶 音乐与频谱</a>
-                    <a class="btn-retro" href="photos.html">📸 合照拍立得</a>
+    <!-- 桌面双栏布局容器 -->
+    <div class="desktop-container">
+        
+        <!-- 左侧：经典欢迎窗口（带原照片与导航） -->
+        <div class="window left-window">
+            <div class="win-header">
+                <div class="win-title">WELCOME_TO_ILLIT.exe</div>
+                <div class="win-controls"><span>_</span><span>▢</span><span>X</span></div>
+            </div>
+            <div class="win-content">
+                <div class="pink-title">Magnetic Love! 🎧</div>
+                <img src="IMG_4415.jpeg" class="photo-frame" alt="ILLIT Photo">
+                <div class="welcome-msg">欢迎回来！经典复古频道与系统已全部准备就绪。</div>
+                <div class="quick-access">
+                    <div class="nav-grid">
+                        <a class="btn-retro" href="music.html">🎶 音乐与频谱</a>
+                        <a class="btn-retro" href="photos.html">📸 合照拍立得</a>
+                    </div>
                 </div>
             </div>
+            <div class="status-bar"><span>Status: Online</span><span>Core: RetroOS v2.6</span></div>
         </div>
-        <div class="status-bar"><span>Status: Online</span><span>Core: RetroOS v2.6</span></div>
-    </div>
 
-    <!-- 2. 新增：作品发展时间轴窗口 -->
-    <div class="window" style="animation-delay: 0.5s;">
-        <div class="win-header">
-            <div class="win-title">Works_Timeline_History.sys</div>
-            <div class="win-controls"><span>_</span><span>▢</span><span>X</span></div>
-        </div>
-        <div class="win-content" style="padding: 15px 20px; text-align: left;">
-            <p style="font-size: 12px; margin-top: 0;">📅 <b>拖动年份查看发展历程：</b> <span id="yearDisplay" style="color: #ff4081; font-weight: bold;">2024</span></p>
+        <!-- 右侧：历程时间轴与动态数据流上下堆叠 -->
+        <div class="right-column">
             
-            <!-- 年份拖动条 -->
-            <input type="range" id="yearSlider" min="2024" max="2026" step="1" value="2024" style="width: 100%; margin: 8px 0; cursor: pointer;" oninput="updateTimeline(this.value)">
-            
-            <!-- 动态内容显示框 -->
-            <div id="timelineContent" style="background: #fff; padding: 10px; border: 1px inset #ccc; font-size: 12px; line-height: 1.5; margin-top: 8px;">
-                <!-- JS 动态填充 -->
-            </div>
-        </div>
-        <div class="status-bar"><span>Module: History.sys</span><span>Status: Active</span></div>
-    </div>
-
-    <!-- 3. 新增：实时动态数据流监视器窗口 -->
-    <div class="window" style="animation-delay: 1s;">
-        <div class="win-header">
-            <div class="win-title">Stage_Energy_Monitor.sys</div>
-            <div class="win-controls"><span>_</span><span>▢</span><span>X</span></div>
-        </div>
-        <div class="win-content" style="padding: 0;">
-            <div class="monitor-screen">
-                <div style="color: #ff80ab; font-weight: bold;">⚡ [ENERGY_WAVE_OUTPUT]</div>
-                <canvas id="energyCanvas"></canvas>
-                <div class="stat-row">
-                    <span>当前Vibe指数: <span id="vibeVal" class="stat-val">98.5</span> BPM</span>
-                    <span>系统功率: <span id="powerVal" class="stat-val">1.2</span> kW</span>
+            <!-- 1. 作品发展时间轴窗口 -->
+            <div class="window">
+                <div class="win-header">
+                    <div class="win-title">Works_Timeline_History.sys</div>
+                    <div class="win-controls"><span>_</span><span>▢</span><span>X</span></div>
                 </div>
+                <div class="win-content" style="padding: 10px 15px; text-align: left;">
+                    <p style="font-size: 11px; margin: 0 0 5px 0;">📅 <b>选择年份查看发展历程：</b> <span id="yearDisplay" style="color: #ff4081; font-weight: bold;">2024</span></p>
+                    
+                    <!-- 年份拖动条 -->
+                    <input type="range" id="yearSlider" min="2024" max="2026" step="1" value="2024" style="width: 100%; margin: 5px 0; cursor: pointer;" oninput="updateTimeline(this.value)">
+                    
+                    <!-- 动态内容显示框 -->
+                    <div id="timelineContent" style="background: #fff; padding: 8px; border: 1px inset #ccc; font-size: 11px; line-height: 1.4; margin-top: 5px;">
+                        <!-- JS 动态填充 -->
+                    </div>
+                </div>
+                <div class="status-bar"><span>Module: History.sys</span><span>Active</span></div>
             </div>
-            <div style="padding: 0 20px 15px 20px; display: flex; gap: 10px; justify-content: center;">
-                <button class="btn-retro" style="flex:1; padding:6px;" onclick="boostEnergy()">🔥 注入能量 (+Boost)</button>
-                <button class="btn-retro" style="flex:1; padding:6px;" onclick="resetData()">🔄 重置波形</button>
+
+            <!-- 2. 实时动态数据流监视器窗口 -->
+            <div class="window">
+                <div class="win-header">
+                    <div class="win-title">Stage_Energy_Monitor.sys</div>
+                    <div class="win-controls"><span>_</span><span>▢</span><span>X</span></div>
+                </div>
+                <div class="win-content" style="padding: 10px 15px;">
+                    <div class="monitor-screen" style="margin: 0;">
+                        <div style="color: #ff80ab; font-weight: bold; font-size: 10px;">⚡ [ENERGY_WAVE_OUTPUT]</div>
+                        <canvas id="energyCanvas"></canvas>
+                        <div class="stat-row">
+                            <span>Vibe指数: <span id="vibeVal" class="stat-val">98.5</span> BPM</span>
+                            <span>系统功率: <span id="powerVal" class="stat-val">1.2</span> kW</span>
+                        </div>
+                    </div>
+                    <div style="margin-top: 8px; display: flex; gap: 8px; justify-content: center;">
+                        <button class="btn-retro" style="flex:1; padding:4px; font-size:11px;" onclick="boostEnergy()">🔥 注入能量</button>
+                        <button class="btn-retro" style="flex:1; padding:4px; font-size:11px;" onclick="resetData()">🔄 重置波形</button>
+                    </div>
+                </div>
+                <div class="status-bar"><span>Stream: Live</span><span>FPS: 60</span></div>
             </div>
+
         </div>
-        <div class="status-bar"><span>Stream: Live</span><span>FPS: 60</span></div>
+
     </div>
 
     <script>
@@ -186,18 +199,18 @@
 
         // --- B. 作品发展时间轴逻辑 ---
         const timelineData = {
-            "2024": { album: "SUPER REAL ME (出道迷你专辑)", song: "Magnetic", event: "正式出道，凭借标志性风格打破多项流媒体记录。" },
-            "2025": { album: "I'LL LIKE YOU (第二张迷你专辑)", song: "Cherish (My Love)", event: "发布全新概念作品，展开多城市见面会与音乐节演出。" },
-            "2026": { album: "Digital Single / Special Project", song: "New Release Vibe", event: "推出全新数字单曲，上线多维互动与实时可视化数据监视系统。" }
+            "2024": { album: "SUPER REAL ME (出道迷你)", song: "Magnetic", event: "正式出道，凭借标志性风格打破多项记录。" },
+            "2025": { album: "I'LL LIKE YOU (第2张迷你)", song: "Cherish (My Love)", event: "发布全新概念作品，展开多城市见面会与演出。" },
+            "2026": { album: "Digital Single / Special Project", song: "New Release Vibe", event: "推出数字单曲，上线多维互动与实时可视化监视系统。" }
         };
 
         function updateTimeline(year) {
             document.getElementById('yearDisplay').innerText = year;
             const data = timelineData[year];
             document.getElementById('timelineContent').innerHTML = `
-                <p style="margin: 3px 0;"><b>💿 核心专辑：</b>${data.album}</p>
-                <p style="margin: 3px 0;"><b>🎵 代表曲目：</b>${data.song}</p>
-                <p style="margin: 3px 0; color: #555;"><b>✨ 重要事件：</b>${data.event}</p>
+                <p style="margin: 2px 0;"><b>💿 核心专辑：</b>${data.album}</p>
+                <p style="margin: 2px 0;"><b>🎵 代表曲目：</b>${data.song}</p>
+                <p style="margin: 2px 0; color: #555;"><b>✨ 重要事件：</b>${data.event}</p>
             `;
         }
         updateTimeline("2024"); // 初始化
@@ -207,9 +220,9 @@
         const ctx = canvas.getContext('2d');
         
         canvas.width = canvas.clientWidth;
-        canvas.height = 90;
+        canvas.height = 70;
 
-        let dataPoints = new Array(40).fill(45);
+        let dataPoints = new Array(35).fill(40);
         let currentVibe = 98.5;
 
         function drawChart() {
@@ -228,8 +241,8 @@
 
             // 动态产生随机波动数据
             let lastVal = dataPoints[dataPoints.length - 1];
-            let nextVal = lastVal + (Math.random() * 18 - 9);
-            nextVal = Math.max(10, Math.min(85, nextVal));
+            let nextVal = lastVal + (Math.random() * 16 - 8);
+            nextVal = Math.max(5, Math.min(65, nextVal));
             dataPoints.shift();
             dataPoints.push(nextVal);
 
@@ -241,7 +254,7 @@
             let stepX = canvas.width / (dataPoints.length - 1);
             for (let i = 0; i < dataPoints.length; i++) {
                 let x = i * stepX;
-                let y = canvas.height - (dataPoints[i] / 90) * canvas.height;
+                let y = canvas.height - (dataPoints[i] / 70) * canvas.height;
                 if (i === 0) ctx.moveTo(x, y);
                 else ctx.lineTo(x, y);
             }
@@ -256,13 +269,13 @@
 
         function boostEnergy() {
             for (let i = 0; i < dataPoints.length; i++) {
-                dataPoints[i] = Math.min(85, dataPoints[i] + Math.random() * 30);
+                dataPoints[i] = Math.min(65, dataPoints[i] + Math.random() * 25);
             }
             document.getElementById('powerVal').innerText = (Math.random() * 2.5 + 3.0).toFixed(1);
         }
 
         function resetData() {
-            dataPoints.fill(45);
+            dataPoints.fill(40);
             document.getElementById('powerVal').innerText = "1.2";
         }
     </script>
