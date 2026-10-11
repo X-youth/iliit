@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ILLIT Retro World 🎀</title>
+    <title>ILLIT Dreamcore World 🎀</title>
     <link rel="stylesheet" href="https://unpkg.com/7.css">
     <style>
         /* --- 全局鼠标与复古基础样式 --- */
@@ -40,11 +40,25 @@
             margin-top: 70px; width: 90%; max-width: 600px; 
             display: flex; flex-direction: column; gap: 20px; padding-bottom: 30px;
         }
+
+        /* 动态图表卡片样式 */
+        .monitor-screen {
+            background: #1a1a1a; border: 2px inset #fff; padding: 10px;
+            color: #78FFB1; font-size: 12px; position: relative;
+        }
+        canvas {
+            width: 100%; height: 120px; background: #000; border: 1px solid #444; display: block;
+        }
+        
+        .stat-row {
+            display: flex; justify-content: space-between; margin-top: 8px; font-size: 11px; color: #fff;
+        }
+        .stat-val { color: #ff80ab; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <!-- 顶部精简导航栏（只留首页、音乐、合照） -->
+    <!-- 顶部精简导航栏 -->
     <div class="global-nav-bar">
         <a href="index.html">🏠 首页</a>
         <a href="music.html">🎶 音乐</a>
@@ -59,8 +73,8 @@
                 <div class="title-bar-text">ILLIT_Welcome_Center.exe</div>
             </div>
             <div class="window-body" style="text-align: center;">
-                <h2 style="color: #ff4081; margin: 10px 0;">✨ ILLIT Retro Project ✨</h2>
-                <p style="color: #555; font-size: 13px;">欢迎来到复古风格作品展示与互动空间！</p>
+                <h2 style="color: #ff4081; margin: 10px 0;">✨ Welcome to ILLIT World ✨</h2>
+                <p style="color: #555; font-size: 13px;">Y2K / Dreamcore 风格作品展示与互动系统</p>
                 <hr style="border: 0; border-top: 1px dashed #ccc; margin: 15px 0;">
                 <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
                     <button onclick="window.location.href='music.html'">🎵 进入音乐与频谱</button>
@@ -69,7 +83,7 @@
             </div>
         </div>
 
-        <!-- 作品发展时间轴窗口 -->
+        <!-- 1. 新增：作品发展时间轴窗口 -->
         <div class="window">
             <div class="title-bar">
                 <div class="title-bar-text">Works_Timeline_History.sys</div>
@@ -87,13 +101,40 @@
             </div>
         </div>
 
+        <!-- 2. 原有的实时信息可视化与动态图表窗口 -->
+        <div class="window">
+            <div class="title-bar">
+                <div class="title-bar-text">Stage_Energy_Monitor.sys (Live)</div>
+            </div>
+            <div class="window-body">
+                <p style="margin-top: 0; font-size: 12px; color: #333;">
+                    📊 <b>实时能量与动态数据流：</b>系统正在监视实时交互与波峰变化。
+                </p>
+                
+                <!-- 动态可视化 Canvas 曲线监视器 -->
+                <div class="monitor-screen">
+                    <div style="margin-bottom: 5px; color: #ff80ab;">⚡ [ENERGY_WAVE_OUTPUT]</div>
+                    <canvas id="energyCanvas"></canvas>
+                    <div class="stat-row">
+                        <span>当前心跳/Vibe指数: <span id="vibeVal" class="stat-val">98.5</span> BPM</span>
+                        <span>能量消耗: <span id="powerVal" class="stat-val">1.2</span> kW</span>
+                    </div>
+                </div>
+
+                <div style="margin-top: 15px; display: flex; gap: 10px; justify-content: center;">
+                    <button onclick="boostEnergy()">🔥 注入能量 (+Boost)</button>
+                    <button onclick="resetData()">🔄 重置波形</button>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <script>
-        // 时间轴数据库
+        // --- A. 作品发展时间轴逻辑 ---
         const timelineData = {
-            "2024": { album: "SUPER REAL ME (出道迷你专辑)", song: "Magnetic", event: "正式出道，凭借标志性风格打破多项流媒体新人记录。" },
-            "2025": { album: "I'LL LIKE YOU (第二张迷你专辑)", song: "Cherish (My Love)", event: "发布全新概念作品，开启多城市粉丝见面会与全球音乐节演出。" },
+            "2024": { album: "SUPER REAL ME (出道迷你专辑)", song: "Magnetic", event: "正式出道，凭借标志性风格打破多项流媒体记录。" },
+            "2025": { album: "I'LL LIKE YOU (第二张迷你专辑)", song: "Cherish (My Love)", event: "发布全新概念作品，展开多城市见面会与音乐节演出。" },
             "2026": { album: "Digital Single / Special Project", song: "New Release Vibe", event: "推出全新数字单曲，上线多维互动与实时可视化数据监视系统。" }
         };
 
@@ -106,8 +147,71 @@
                 <p style="margin: 4px 0; color: #555;"><b>✨ 重要事件：</b>${data.event}</p>
             `;
         }
-        // 初始化默认显示 2024
-        updateTimeline("2024");
+        updateTimeline("2024"); // 初始化
+
+        // --- B. 实时动态可视化图表核心逻辑 ---
+        const canvas = document.getElementById('energyCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        canvas.width = canvas.clientWidth;
+        canvas.height = 120;
+
+        let dataPoints = new Array(50).fill(50);
+        let currentVibe = 98.5;
+
+        function drawChart() {
+            ctx.fillStyle = '#000000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // 绘制网格背景线
+            ctx.strokeStyle = '#222222';
+            ctx.lineWidth = 1;
+            for (let i = 0; i < canvas.width; i += 20) {
+                ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, canvas.height); ctx.stroke();
+            }
+            for (let j = 0; j < canvas.height; j += 20) {
+                ctx.beginPath(); ctx.moveTo(0, j); ctx.lineTo(canvas.width, j); ctx.stroke();
+            }
+
+            // 动态产生随机波动数据
+            let lastVal = dataPoints[dataPoints.length - 1];
+            let nextVal = lastVal + (Math.random() * 20 - 10);
+            nextVal = Math.max(10, Math.min(110, nextVal));
+            dataPoints.shift();
+            dataPoints.push(nextVal);
+
+            // 绘制动态曲线
+            ctx.strokeStyle = '#78FFB1';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            
+            let stepX = canvas.width / (dataPoints.length - 1);
+            for (let i = 0; i < dataPoints.length; i++) {
+                let x = i * stepX;
+                let y = canvas.height - (dataPoints[i] / 120) * canvas.height;
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+
+            // 随机更新动态数值显示
+            currentVibe = (95 + Math.random() * 8).toFixed(1);
+            document.getElementById('vibeVal').innerText = currentVibe;
+        }
+
+        setInterval(drawChart, 150);
+
+        function boostEnergy() {
+            for (let i = 0; i < dataPoints.length; i++) {
+                dataPoints[i] = Math.min(115, dataPoints[i] + Math.random() * 40);
+            }
+            document.getElementById('powerVal').innerText = (Math.random() * 3 + 3.5).toFixed(1);
+        }
+
+        function resetData() {
+            dataPoints.fill(50);
+            document.getElementById('powerVal').innerText = "1.2";
+        }
     </script>
 </body>
 </html>
