@@ -187,6 +187,7 @@
         <source id="audio-src" src="magnetic.mp3.mp3" type="audio/mpeg">
     </audio>
 
+    <!-- 完整的 JavaScript 逻辑 -->
     <script>
         const songs = [
             { title: "Magnetic", cover: "IMG_4458.jpeg", file: "magnetic.mp3.mp3", artist: "NewJeans 1st EP", stats: { streams: [380, 450, 190], labels: ["Spotify", "Apple", "YouTube"], source: "Global Streaming Report", date: "2026-05-18" } },
@@ -207,6 +208,7 @@
 
         // 初始化歌单与图表
         function initPlaylist() {
+            if (!playlistContainer) return;
             playlistContainer.innerHTML = songs.map((song, i) => `
                 <div class="track-item ${i === 0 ? 'active' : ''}" onclick="changeSong(${i})">
                     <div style="font-size: 14px; font-weight: bold; width: 25px; opacity: 0.5;">0${i+1}</div>
@@ -229,13 +231,15 @@
                 item.classList.toggle('active', idx === i);
             });
 
-            title.innerText = song.title;
-            cover.src = song.cover;
-            source.src = song.file;
-            audio.load();
-            audio.play();
-            playBtn.innerText = "❚❚";
-            cover.style.animationPlayState = 'running';
+            if (title) title.innerText = song.title;
+            if (cover) cover.src = song.cover;
+            if (source) source.src = song.file;
+            if (audio) {
+                audio.load();
+                audio.play();
+            }
+            if (playBtn) playBtn.innerText = "❚❚";
+            if (cover) cover.style.animationPlayState = 'running';
             
             showChart(i);
             initAudioVisualizer();
@@ -244,28 +248,35 @@
         // 播放/暂停控制
         function togglePlay() {
             initAudioVisualizer();
+            if (!audio) return;
             if (audio.paused) {
                 audio.play();
-                playBtn.innerText = "❚❚";
-                cover.style.animationPlayState = 'running';
+                if (playBtn) playBtn.innerText = "❚❚";
+                if (cover) cover.style.animationPlayState = 'running';
             } else {
                 audio.pause();
-                playBtn.innerText = "▶";
-                cover.style.animationPlayState = 'paused';
+                if (playBtn) playBtn.innerText = "▶";
+                if (cover) cover.style.animationPlayState = 'paused';
             }
         }
 
         // 播放时间更新
-        audio.ontimeupdate = () => {
-            const min = Math.floor(audio.currentTime / 60);
-            const sec = Math.floor(audio.currentTime % 60);
-            document.getElementById('p-time').innerText = `${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
-        };
+        if (audio) {
+            audio.ontimeupdate = () => {
+                const min = Math.floor(audio.currentTime / 60);
+                const sec = Math.floor(audio.currentTime % 60);
+                const timeEle = document.getElementById('p-time');
+                if (timeEle) {
+                    timeEle.innerText = `${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
+                }
+            };
+        }
 
         // 渲染数据对比柱状图
         function showChart(index) {
             const data = songs[index].stats;
             const container = document.getElementById('chartContainer');
+            if (!container) return;
             container.innerHTML = '';
             
             const maxVal = Math.max(...data.streams);
@@ -284,12 +295,15 @@
                 container.appendChild(col);
             });
             
-            document.getElementById('chartMeta').innerText = `来源: ${data.source} | 日期: ${data.date}`;
+            const metaEle = document.getElementById('chartMeta');
+            if (metaEle) {
+                metaEle.innerText = `来源: ${data.source} | 日期: ${data.date}`;
+            }
         }
 
         // Web Audio API 实时频谱波形分析
         function initAudioVisualizer() {
-            if (isAudioInit) return;
+            if (isAudioInit || !audio) return;
             try {
                 audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                 analyser = audioCtx.createAnalyser();
